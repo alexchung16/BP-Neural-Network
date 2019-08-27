@@ -8,19 +8,90 @@ import numpy as np
 import random
 
 
+class MeanSquareCost(object):
+
+    @staticmethod
+    def fn(a, y):
+        """
+        输出激活输出量和期望值的交叉损失熵
+        :param a: 激活输出量
+        :param y: 期望值
+        :return:
+        """
+        # np.linalg.norm 求取矩阵或向量范数（Matrix or vector norm.），默认2范数
+        return 0.5*np.linalg.norm(a-y)**2
+
+    @staticmethod
+    def delta(z, a, y):
+        """
+        返回输出层的误差(delta)
+        :param z:
+        :param a:
+        :param y:
+        :return:
+        """
+        return(a - y) * sigmoid_prime(z)
+
+
+class CrossEntropyCost(object):
+
+    @staticmethod
+    def fn(a, y):
+        """
+        输出激活函数值和期望值的交叉损失熵
+        :param a: 激活函数值
+        :param y: 期望值
+        :return:
+        """
+        return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
+
+    @staticmethod
+    def delta(z, a, y):
+        """
+        返回输出层的误差(delta)
+        :param z:
+        :param a:
+        :param y:
+        :return:
+        """
+        return a-y
+
+
 class BPNetwork(object):
-    def __init__(self, sizes):
+    def __init__(self, sizes, cost=CrossEntropyCost):
         """
         :param sizes: 网络中各层的神经元的数量
         """
         # 获取网络层数和各层神经元数
-        self.sises = sizes
+        self.sizes = sizes
+        self.cost = cost
         # 获取网络层数
         self.num_layers = len(sizes)
+        self.optimizationWeightInitialization()
+
+    def optimizationWeightInitialization(self):
+        """
+        改进权重初始化
+        均值 = 0
+        标准差 = 1/sqrt(n)
+        :return:
+        """
         # 初始化隐含层和输出层神经元偏置矩阵
-        self.biases = [np.random.randn(b, 1) for b in sizes[1:]]
+        self.biases = [np.random.randn(b, 1) for b in self.sizes[1:]]
         # 初始化隐含层和输出层神经元的权重矩阵
-        self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+        self.weights = [np.random.randn(y, x)/np.sqrt(x) for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+
+    def rawWeightInitialization(self):
+        """
+        原始权重初始化
+        均值 = 0
+        标准差 = 1
+        :return:
+        """
+        # 初始化隐含层和输出层神经元偏置矩阵
+        self.biases = [np.random.randn(b, 1) for b in self.sizes[1:]]
+        # 初始化隐含层和输出层神经元的权重矩阵
+        self.weights = [np.random.randn(y, x) for x, y in zip(self.sizes[:-1], self.sizes[1:])]
 
     def feedforward(self, x):
         """
@@ -32,7 +103,9 @@ class BPNetwork(object):
             x = sigmoid(np.dot(w, x) + b)
         return x
 
-    def SGD(self, train_data, epochs, mini_batch_size, eta,  lmbda=0.0, test_data=None):
+    def SGD(self, training_data, epochs, mini_batch_size, eta,  lmbda=0.0, evaluation_data=None,
+            monitor_training_cost=False, monitor_training_accuracy=False,
+            monitor_evaluation_cost=False, monitor_evaluation_accuracy=False):
         """
         随机梯度下降（Stochastic Gradient Descent)
         :param train_data: 训练数据元祖(x,y)列表
@@ -40,17 +113,25 @@ class BPNetwork(object):
         :param mini_batch_size: 最小批大小
         :param eta: 学习率
         :param lmbda(lambda): 正则化参数
-        :param test_data: 测试数据
+        :param evaluation_data:  评估数据集
+        :param monitor_evaluation_cost: 监控评估数据损失
+        :param monitor_evaluation_accuracy: 监控评估数据准确性
+        :param monitor_train_cost: 监控训练数据损失
+        :param monitor_train_accuracy: 监控训练数据准确性
         :return:
         """
+
         # 获取 zip 对象存储数据
-        train_data = list(train_data)
-        test_data = list(test_data)
-        # 获取测试数据大小
+        train_data = list(training_data)
+        eval_data = list(evaluation_data)
+        # 获取训练数据和评估数据的大小
         n_train = len(train_data)
-        n_test = 0
-        if test_data:
-            n_test = len(test_data)
+        n_eval = 0
+        if evaluation_data:
+            n_eval = len(eval_data)
+        # 初始化监控参数列表
+        evaluation_cost, evaluation_accuracy = [], []
+        training_cost, training_accuracy = [], []
 
         for r in range(epochs):
             random.shuffle(train_data)
@@ -61,10 +142,27 @@ class BPNetwork(object):
             for mini_batch in mini_batches:
                 # 利用最小批更新权重和偏置
                 self.update_mini_batch(mini_batch, eta, lmbda, len(train_data))
-            if test_data:
-                print("Epoch {0}:{1}/{2}".format(r, self.evaluate(test_data), n_test))
-            else:
-                print("Epoch {0} complete".format(r))
+
+            # 输出当前迭代次数
+            print("Epoch {0} training complete".format(r))
+            if monitor_training_cost:
+                cost = self.total_cost(train_data, lmbda)
+                training_cost.append(cost)
+                print("Cost on training data: {}".format(cost))
+            if monitor_training_accuracy:
+                accuracy = self.accuracy(train_data, convert=True)
+                training_accuracy.append(accuracy)
+                print("Accuracy on training data: {} / {}".format(accuracy, n_train))
+            if monitor_evaluation_cost:
+                cost = self.total_cost(eval_data, lmbda, convert=True)
+                evaluation_cost.append(cost)
+                print("Cost on evaluation data: {}".format(cost))
+            if monitor_evaluation_accuracy:
+                accuracy = self.accuracy(eval_data)
+                evaluation_accuracy.append(accuracy)
+                print("Accuracy on evaluation data: {} / {}".format(self.accuracy(eval_data), n_eval))
+
+        return evaluation_cost, evaluation_accuracy, training_cost, training_accuracy
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         """
@@ -126,7 +224,7 @@ class BPNetwork(object):
         # 均方误差损失
         # delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         # 交叉熵损失
-        delta = self.cost_derivative(activations[-1], y)
+        delta = self.cost.delta(zs[-1], activations[-1], y)
         ######################################################
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         nabla_b[-1] = delta
@@ -141,14 +239,37 @@ class BPNetwork(object):
             nabla_b[-l] = delta
         return nabla_w, nabla_b
 
-    def evaluate(self, test_data):
+    def accuracy(self, data, convert=False):
         """
-        评估函数
-        :param test_data: 测试集
+         评估函数
+        :param data: 评估数据
+        :param convert: 是否执行转换
         :return:
         """
-        test_results = [(np.argmax(self.feedforward(x)), y) for x, y in test_data]
-        return sum(int(x == y) for (x, y) in test_results)
+        # 当数据集为 training data 标签 shape = (10,1) 为 onehot(独热编码) 需要解码
+        if convert:
+            results = [(np.argmax(self.feedforward(x)), np.argmax(y)) for x, y in data]
+        # 当数据集为 validation data 或 test data 标签 shape = (1,1) 不需要解码
+        else:
+            results = [(np.argmax(self.feedforward(x)), y) for x, y in data]
+        return sum(int(x == y) for (x, y) in results)
+
+    def total_cost(self, data, lmbda, convert=False):
+        """
+        损失函数
+        :param data:
+        :param labda:
+        :param convert:
+        :return:
+        """
+        cost = 0.0
+        for x, y in data:
+            a = self.feedforward(x)
+            if convert: y = vectorized_result(y)
+            cost += self.cost.fn(a, y) / len(data)
+        # 正则化项
+        cost += 0.5 * (lmbda / len(data)) * sum(np.linalg.norm(w) ** 2 for w in self.weights)
+        return cost
 
     def cost_derivative(self, out_activations, y):
         """
@@ -159,6 +280,16 @@ class BPNetwork(object):
         """
         return out_activations - y
 
+
+def vectorized_result(j):
+    """
+    生成独热label
+    :param j: 十进制数值
+    :return:
+    """
+    e = np.zeros((10, 1))
+    e[j] = 1.0
+    return e
 
 # 其他函数(miscellaneous)
 def sigmoid(z):
@@ -191,6 +322,7 @@ def sgn(x):
         for j in range(x.shape[1]):
             x[i][j] = sgn(x[i][j])
     return x
+
 
 if __name__ == "__main__":
 
