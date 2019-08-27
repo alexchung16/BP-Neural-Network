@@ -12,6 +12,12 @@ from MNIST_Loader import load_data_wrapper
 
 
 def readTrainingData(train_data):
+    """
+    zip 格式 train_data
+    :param train_data:
+    :return:
+    """
+
     i = 0
     data = list(train_data)
     train_image = np.zeros(((data[0][0]).shape[0], len(data)))
@@ -21,6 +27,7 @@ def readTrainingData(train_data):
         train_label[:, i] = image.reshape((data[1][0]).shape[0],)
         i += 1
     return train_image, train_label
+
 
 def showImage(img_data):
     """
