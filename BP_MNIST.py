@@ -19,12 +19,13 @@ def readTrainingData(train_data):
     """
 
     i = 0
-    data = list(train_data)
-    train_image = np.zeros(((data[0][0]).shape[0], len(data)))
-    train_label = np.zeros(((data[0][1]).shape[0], len(data)))
-    for image, label in train_data:
-        train_image[:, i] = image.reshape((data[0][0]).shape[0],)
-        train_label[:, i] = image.reshape((data[1][0]).shape[0],)
+    training_data = list(train_data)
+    train_image = np.zeros(((training_data[0][0]).shape[0], len(training_data)))
+    train_label = np.zeros(((training_data[0][1]).shape[0], len(training_data)))
+
+    for image, label in training_data:
+        train_image[:, i] = image.reshape((training_data[0][0]).shape[0],)
+        train_label[:, i] = label.reshape((training_data[0][1]).shape[0],)
         i += 1
     return train_image, train_label
 
@@ -51,9 +52,8 @@ if __name__ == "__main__":
     #         monitor_evaluation_cost=True, monitor_evaluation_accuracy=True,
     #         )
 
-    train_image, train_label = readTrainingData(training_data)
-    print(train_image.shape)
-    print(train_label.shape)
+    # train_image, train_label = readTrainingData(training_data)
+    # showImage(train_image[:, 1].reshape(28, 28))
 
 
 
