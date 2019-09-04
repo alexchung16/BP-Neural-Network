@@ -6,10 +6,11 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-import BP_Network_MSE
-import BP_Network_Cross_Entropy
-from MNIST_Loader import load_data_wrapper
 
+from MNIST_Loader import load_data_wrapper, load_data_shared
+import CNN_Network
+from CNN_Network import CNNNetwork
+from CNN_Network import ConvPoolLayer, FullyConnectedLayer, SoftmaxLayer
 
 def readTrainingData(train_data):
     """
@@ -41,19 +42,43 @@ def showImage(img_data):
 
 
 if __name__ == "__main__":
-    # 输入数据
-    training_data, validation_data, testing_data = load_data_wrapper()
 
-    # net = BP_Network_MSE.BPNetwork([784, 30, 10]
-    net = BP_Network_Cross_Entropy.BPNetwork([784, 30, 10])
-    net.optimizationWeightInitialization()
+    # 测试一 全连接网络(full connect)
+    # # 输入数据
+    # training_data, validation_data, testing_data = load_data_wrapper()
+    # # 提取zip格式数据de
+    #
+    # training_data = list(training_data)
+    # validation_data = list(validation_data)
+    # testing_data = list(testing_data)
+    # # net = BP_Network_MSE.BPNetwork([784, 30, 10]
+    # net = BP_Network_Cross_Entropy.BPNetwork([784, 30, 30, 10])
+    # net.optimizationWeightInitialization()
     # net.SGD(training_data, 30, 10, 0.1, 5.0, validation_data,
     #         monitor_training_cost=True, monitor_training_accuracy=True,
     #         monitor_evaluation_cost=True, monitor_evaluation_accuracy=True,
     #         )
 
+    # 测试二 卷积神经网路测试(CNN)
+    training_data, validation_data, test_data = load_data_shared()
+    mini_batch_size = 10
+    net = CNNNetwork([
+        ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
+                      filter_shape=(20, 1, 5, 5),
+                      pool_size=(2, 2)),
+        ConvPoolLayer(image_shape=(mini_batch_size, 20, 12, 12),
+                      filter_shape=(40, 20, 5, 5),
+                      pool_size=(2, 2)),
+        FullyConnectedLayer(n_in=40 * 4 * 4, n_out=100),
+        SoftmaxLayer(n_in=100, n_out=10)],
+        mini_batch_size)
+    net.SGD(training_data, 60, mini_batch_size, 0.1, validation_data, test_data)
+
+
+    # 测试三 读取并显示训练数据
     # train_image, train_label = readTrainingData(training_data)
-    # showImage(train_image[:, 1].reshape(28, 28))
+    # showImage(train_image[:, 1]
+    # .reshape(28, 28))
 
 
 
