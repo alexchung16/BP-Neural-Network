@@ -8,6 +8,8 @@ import os
 import _pickle as cPickle
 import gzip
 import numpy as np
+import theano
+import theano.tensor as T
 
 
 def load_data():
@@ -41,9 +43,29 @@ def load_data_wrapper():
     return training_data, validation_data, testing_data
 
 
+def load_data_shared():
+    """
+    theano 训练专用加载数据
+    :return:
+    """
+    train_data, validate_data, test_data = load_data()
+
+    def shared(data):
+        """
+        将数据写入被分享的变量
+        :param data:
+        :return:
+        """
+        share_x = theano.shared(np.asarray(data[0], dtype=theano.config.floatX), borrow=True)
+        share_y = theano.shared(np.asarray(data[1], dtype=theano.config.floatX), borrow=True)
+        return share_x, T.cast(share_y, "int32")
+    return [shared(train_data), shared(validate_data), shared(test_data)]
+
+
 def vectorised_result(y):
     """
     格式化标签为10*1维array
+
     :param y:
     :return:
     """
@@ -53,6 +75,7 @@ def vectorised_result(y):
 
 
 if __name__ == "__main__":
-    train_data, validation_data, testing_data = load_data_wrapper()
-    print(list(train_data)[1])
+    training_data, validation_data, test_data = load_data()
+    # train_data, validation_data, testing_data = load_data_shared()
+    print(training_data[1])
 
