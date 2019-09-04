@@ -25,9 +25,9 @@ class MeanSquareCost(object):
     def delta(z, a, y):
         """
         返回输出层的误差(delta)
-        :param z:
-        :param a:
-        :param y:
+        :param z:输出层未激活量
+        :param a:激活输出量
+        :param y:期望值
         :return:
         """
         return(a - y) * sigmoid_prime(z)
@@ -49,9 +49,9 @@ class CrossEntropyCost(object):
     def delta(z, a, y):
         """
         返回输出层的误差(delta)
-        :param z:
-        :param a:
-        :param y:
+        :param z:输出层未激活量
+        :param a:输出层激活量
+        :param y:期望值
         :return:
         """
         return a-y
