@@ -1,7 +1,10 @@
-#-*- coding: utf-8 -*-
-# @ fuction 手撕BP神经网络(基于交叉损失熵 Cross Entropy)
-# @ author alexchung
-# @ date 25/7/2019 PM 16:46
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @ File BP_Network_Cross_Entropy.py
+# @ Description 手撕BP神经网络(基于交叉损失熵 Cross Entropy)
+# @ Author alexchung
+# @ Time 25/7/2019 PM 16:46
+
 
 import sys
 import numpy as np

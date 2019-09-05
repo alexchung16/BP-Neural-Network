@@ -1,7 +1,10 @@
-#-*- coding: utf-8 -*-
-# @ fuction 手撕BP神经网络
-# @ author alexchung
-# @ date 12/8/2019 AM 09:27
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @ File MINIST_Loader.py
+# @ Description 加载 MNIST 数据集
+# @ Author alexchung
+# @ Time 12/8/2019 AM 09:27
+
 
 from __future__ import print_function
 import os

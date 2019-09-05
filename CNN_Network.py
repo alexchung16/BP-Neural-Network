@@ -1,7 +1,9 @@
-#-*- coding: utf-8 -*-
-# @ fuction 卷积神经网络
-# @ author alexchung
-# @ date 29/8/2019 PM 17:29
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @ File CNN_Network.py
+# @ Description 卷积神经网络
+# @ Author alexchung
+# @ Time 29/8/2019 PM 17:29
 
 # 标准库
 import os

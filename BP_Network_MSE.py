@@ -1,7 +1,9 @@
-#-*- coding: utf-8 -*-
-# @ fuction 手撕BP神经网络(基于均方误差损失 Mean Square Error)
-# @ author alexchung
-# @ date 25/7/2019 PM 16:46
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @ File BP_Network_MSE.py
+# @ Description 手撕BP神经网络(基于均方误差损失 Mean Square Error)
+# @ Author alexchung
+# @ Time 25/7/2019 PM 16:46
 
 import os
 import numpy as np

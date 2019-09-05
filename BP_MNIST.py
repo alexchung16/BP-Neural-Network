@@ -1,7 +1,10 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @ fuction 利用BP网络训练 MNIST 数据集进行分类
-# @ author alexchung
-# @ date 13/8/2019 AM 10:52
+# @ File BP_MNIST.py
+# @ Description 利用BP网络训练 MNIST 数据集进行分类
+# @ Author alexchung
+# @ Time 13/8/2019 AM 10:52
+
 
 import numpy as np
 import random

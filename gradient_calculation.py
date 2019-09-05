@@ -1,7 +1,10 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @ fuction 梯度计算
-# @ author alexchung
-# @ date 27/8/2019 PM 20:00
+# @ File gradient_calculation.py
+# @ Description 梯度近似计算
+# @ Author alexchung
+# @ Time 27/8/2019 PM 20:00
+
 
 import numpy as np
 
