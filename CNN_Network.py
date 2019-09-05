@@ -95,14 +95,7 @@ class CNNNetwork(object):
         # 定义函数训练最小批
         # 评估集(validation set)和测试集(test set)的最小批准确性
         i = T.lscalar()
-        # train_mb_func = theano.function(
-        #     [i], cost, updates=updates,
-        #     givens={
-        #             self.x:
-        #                 training_x[i * self.mini_batch_size: (i + 1) * self.mini_batch_size],
-        #             self.y:
-        #                 training_y[i * self.mini_batch_size: (i + 1) * self.mini_batch_size]
-        #         })
+        # 训练方法
         train_mb_func = theano.function(
             [i], cost, updates=updates,
             givens={
