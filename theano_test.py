@@ -1,7 +1,10 @@
-#-*- coding: utf-8 -*-
-# @ fuction theano test
-# @ author alexchung
-# @ date 2/9/2019 PM 17:29
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @ File theano_test.py
+# @ Description theano test
+# @ Author alexchung
+# @ Time 2/9/2019 PM 17:29
+
 
 import numpy as np
 import theano
